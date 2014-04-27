@@ -1,5 +1,6 @@
 '''
-	A command-line program for searching a clean State Dept Consular names JSON file
+	A command-line program for searching a clean State Dept Consular names JSON file.
+	Asks for a last name, then first name.
 '''
 import json
 

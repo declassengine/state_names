@@ -1,5 +1,13 @@
+'''
+	This file contains tests for manually evaluating some of the data
+	parsed by state_re.py.
+
+	Please excuse any ugliness / sloppiness
+'''
+
 import json
 import state_re
+import random
 
 # Generic function for re-processing the clean files
 def getCleanData():
@@ -27,6 +35,28 @@ def getCleanData():
 
 	return c_hash
 
+# Get num random numbers within the collection of people and return verbose person data
+def randomPeople(people, num=15):
+	random_people = []
+
+	# Populate a list with num random numbers
+	for x in range(0, num):
+		random_people.append(random.randint(0, len(people)))
+
+	# Iterate through the random index values on the original people list, printing info along the way
+	for random_person in random_people:
+		person = people[random_person]
+		print '\n======\n' + person['last_name'] + ', ' + person['first_name']
+
+		for position in person['positions']:
+			print '\t TITLE: ' + position['title']
+
+			if 'year' in position:
+				print '\t\t YEAR: ' + position['year']
+			if 'year_range' in position:
+				print '\t\t YEARS: ' + position['year_range']
+			if 'location' in position:
+				print '\t\t LOCATION: '	+ position['location']
 
 
 # Perform all of the checks and be verbose about it.

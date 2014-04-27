@@ -1,6 +1,8 @@
 ''' Quick and dirty program for pulling Diplomat name and position
 	information from the State Dept website. Makes use of the BeautifulSoup
-	HTML parser module
+	HTML parser module and the 'state_re.py' module included in this
+	directory. Output is a file called 'output.json', containing
+	specific but unparsed text from the scrape.
 '''
 
 
@@ -23,7 +25,7 @@ def main():
 		next_page = getPage(prefix + current_url, names_dict)
 
 		if(next_page):
-			current_url = next_page.a.get("href")
+			current_url = next_page.a.get("href") # If there is a link to a subsequent page, follow it
 		else:
 			current_url = None	
 
@@ -38,12 +40,12 @@ def main():
 '''
 	Adds the name information for a given page. A "page" is all of the last
 	names for a letter in the alphabet, so A-Z. In other words, this function should
-	run 26 times. It's caller function should know how to cycle based on the soup 
+	run 26 times. Its caller function should know how to cycle based on the soup 
 	object it does or does not return.
 
 	At the end, this function looks for a "next letter" link in the html and returns
 	that object. If the object is empty, then the caller function knows to terminate
-	its while loop
+	its while loop.
 '''
 def getPage(url, names_dict):
 
