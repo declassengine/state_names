@@ -8,7 +8,7 @@ import MySQLdb as sql
 
 def main():
 	
-	# Attempt to load the settings using the loadCondig() function below.
+	# Attempt to load the settings using the loadConfig() function below.
 	# Exit the program if this doesn't work and print an error message.
 	settings = loadConfig()
 	if settings is 0:
@@ -17,10 +17,14 @@ def main():
 
 	# Try to open a db connection. Defaults to localhost.
 	try:
-		db = sql.connect(passwd=settings['password'], user=settings['user'], db=settings['db_name'])
+		db = sql.connect(passwd=settings['password'], user=settings['user'], 
+			db=settings['db_name'], host=settings['db_host'], charset='utf8', use_unicode=True)
 	except IOError:
 		print 'Unable to connect to database!'
 		return 1
+
+	# Database configuration
+	db.autocommit = True
 
 	# Next, try to open the correct output file
 	try:
@@ -36,6 +40,8 @@ def main():
 	# Loop through each <person> in <people> and add the relevant parts to the db		
 	cursor = db.cursor()
 	records_added = 0
+	total_records = len(people)
+	percent = .10
 
 	for person in people:
 		try:
@@ -43,6 +49,11 @@ def main():
 		except IOError:
 			print 'There was an error adding ' + person['name']
 			pass
+
+		# Update console every time 10% of the total records have been added
+		if records_added >= total_records * percent:
+			print str(records_added) + ' records added out of ' + str(total_records)
+			percent += .10
 
 	cursor.close()
 	db.commit()
@@ -61,7 +72,12 @@ def addPerson(person, curs):
 	# Insert the person's name into the 'people' table.
 	last_name = person['last_name']
 	first_name = person['first_name']
-	curs.execute("""INSERT INTO consular_people (first_name, last_name) VALUES (%s, %s)""", (first_name, last_name))
+	try:
+		curs.execute("""INSERT INTO consular_people (first_name, last_name) VALUES (%s, %s)""", (first_name, last_name))
+	except sql.Error, e:
+		print '--= ERROR for [' + last_name + ', ' + first_name + '] =--'
+		print e
+		pass
 
 	# Isolate the added person_id, then add each position to the 'positions' table.
 	# person_id is the foreign key in the 'positions' table
@@ -70,18 +86,38 @@ def addPerson(person, curs):
 		# The first check is to see if there is location data
 		if 'location' in position:
 			if 'year_from' in position and 'year_to' in position:
-				curs.execute("""INSERT INTO consular_positions (location, title, date_from, date_to, person_id) VALUES(%s, %s, %s, %s, %s)""", (position['location'], 
-					position['title'], formatYear(position['year_from']), formatYear(position['year_to']), next_id))
+				try:
+					curs.execute("""INSERT INTO consular_positions (location, title, date_from, date_to, person_id) VALUES(%s, %s, %s, %s, %s)""", (position['location'], 
+						position['title'], formatYear(position['year_from']), formatYear(position['year_to']), next_id))
+				except sql.Error, e:
+					print '--= ERROR =--'
+					print e
+					pass	
 			elif 'year_single' in position:
-				curs.execute("""INSERT INTO consular_positions (location, title, date_single, person_id) VALUES(%s, %s, %s, %s)""", (position['location'], 
-					position['title'], formatYear(position['year_single']), next_id))
+				try:
+					curs.execute("""INSERT INTO consular_positions (location, title, date_single, person_id) VALUES(%s, %s, %s, %s)""", (position['location'], 
+						position['title'], formatYear(position['year_single']), next_id))
+				except sql.Error, e:
+					print '--= ERROR =--'
+					print e
+					pass	
 		else:
 			if 'year_from' in position and 'year_to' in position:
-				curs.execute("""INSERT INTO consular_positions (title, date_from, date_to, person_id) VALUES(%s, %s, %s, %s)""", (position['title'], 
-					formatYear(position['year_from']), formatYear(position['year_to']), next_id))
+				try:
+					curs.execute("""INSERT INTO consular_positions (title, date_from, date_to, person_id) VALUES(%s, %s, %s, %s)""", (position['title'], 
+						formatYear(position['year_from']), formatYear(position['year_to']), next_id))
+				except sql.Error, e:
+					print '--= ERROR =--'
+					print e
+					pass	
 			elif 'year_single' in position:
-				curs.execute("""INSERT INTO consular_positions (title, date_single, person_id) VALUES(%s, %s, %s)""", (position['title'], 
-					formatYear(position['year_single']), next_id))
+				try:
+					curs.execute("""INSERT INTO consular_positions (title, date_single, person_id) VALUES(%s, %s, %s)""", (position['title'], 
+						formatYear(position['year_single']), next_id))
+				except sql.Error, e:
+					print '--= ERROR =--'
+					print e
+					pass	
 
 	return 1
 
