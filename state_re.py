@@ -55,7 +55,7 @@ def cleanConsularData(data):
 	print 'Successfully added ' + str(clean_data['count']) + ' entries.'
 	if(clean_data['count'] != data['count']):
 		print 'There were ' + str(data['count'] - clean_data['count']) + ' discrepancies!!'
-	names2json.save(clean_data)
+	names2json.save(clean_data, 'output_clean.json')
 	print '==========\n\n'
 
 
@@ -125,12 +125,12 @@ def cleanPositions(positions_list):
 		year = year_parser.search(text)
 		if(year):
 			if(year.group('year_from') and year.group('year_to')):
-				year_range = year.group('year_from') + '-' + year.group('year_to')
-				clean_pos['year_range'] = year_range
+				clean_pos['year_from'] = year.group('year_from')
+				clean_pos['year_to'] = year.group('year_to')
 			elif(year.group('simple_year')):
-				clean_pos['year'] = year.group('simple_year')
+				clean_pos['year_single'] = year.group('simple_year')
 			elif(year.group('complex_year')):
-				clean_pos['year'] = year.group('complex_year')
+				clean_pos['year_single'] = year.group('complex_year')
 			else:
 				clean_pos['year_text'] = text
 		else:

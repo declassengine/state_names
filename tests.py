@@ -95,7 +95,7 @@ def checkDates(people):
 
 	for person in people:
 		for position in person['positions']:
-			if 'year' not in position and 'year_range' not in position:
+			if 'year_single' not in position and 'year_from' not in position:
 				result['errors'] += 1
 				result['data'].append(position['raw_position'])
 			if 'year_text' in position:
