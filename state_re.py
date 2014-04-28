@@ -11,7 +11,7 @@
 	The 'clean_data' dict contains three keys: 'count' (the number of people), 
 	'errors' (any generated errors), and 'people' (the list of individual person dicts). 
 	A 'person' dict has a 'first_name', 'last_name' and a list of 'positions'.
-	Each 'position' MIGHT have: a 'year' or 'year_range', a 'location'.
+	Each 'position' MIGHT have: a 'year_single','year_from', 'year_to', or a 'location'.
 '''
 
 import re
