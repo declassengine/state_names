@@ -116,9 +116,12 @@ def cleanPositions(positions_list):
 			clean_pos['title'] = split_str[0]
 			text = split_str[1]
 		else:
-			full_title = full_position_parser.match(text) # We use 'match' her because it's always at the start of the string
+			full_title = full_position_parser.match(text) # We use 'match' here because it's always at the start of the string
 			if(full_title):
 				clean_pos['title'] = full_title.groups()[0]
+
+		# This helper function removes the State Dept Site's web errors for titles
+		scrubBadTitles(clean_pos)
 
 		# Check for the year info, first looking for a range then checking in
 		# decreasing complexity. Makes use of the year_parser's regex named groups
@@ -156,3 +159,13 @@ def cleanPositions(positions_list):
 			print 'No positions were cleaned for a person.'	
 
 	return cleaned_positions
+
+'''
+	The State Dept Website has a few position titles that do not have appropriate
+	labels. This is an error in their DB/ Web backend and it looks like:
+	"'no-label-found for chief-financial-officer in /db/cms/apps/principals-chiefs/code-tables/roles/data"
+	This function removes that mess and replaces it with "NO POSITION TITLE AVAILABLE"
+'''
+def scrubBadTitles(position):
+	if 'no-label' in position['title']:
+		position['title'] = 'NO POSITION TITLE AVAILABLE'
